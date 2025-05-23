@@ -36,7 +36,6 @@ dlt-state/
 
 # Environment variables
 .env
-.env.*
 secrets/
 
 # Logs
