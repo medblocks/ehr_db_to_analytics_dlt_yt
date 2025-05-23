@@ -24,19 +24,14 @@ cp .env.example .env
 
 Edit `.env` with your database credentials if different from the defaults.
 
-### 4. Test connections
 
-```bash
-python test_connections.py
-```
-
-### 5. Run the ETL pipeline
+### 4. Run the ETL pipeline
 
 ```bash
 python etl/simple_etl.py
 ```
 
-### 6. Start the API server
+### 5. Start the API server
 
 ```bash
 python api/simple_api.py
