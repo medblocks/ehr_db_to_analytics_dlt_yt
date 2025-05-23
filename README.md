@@ -51,7 +51,6 @@ The API will be available at `http://localhost:5001` with endpoints:
 
 ## Key Features
 
-- **40% fewer lines** compared to manual ETL
 - **Unified database operations** through dlt
 - **Automatic schema management** with dlt
 - **Built-in error handling** and retries
