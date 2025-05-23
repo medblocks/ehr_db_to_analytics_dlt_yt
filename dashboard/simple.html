@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Vitals by Age Group</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="bg-gray-100 font-sans">
+		<!-- Header -->
+		<div class="bg-blue-600 text-white p-5 rounded-lg m-5">
+			<h1 class="text-2xl font-bold">Vitals by Age Group</h1>
+			<p class="text-blue-100 mt-2">
+				Optimized ETL Pipeline for Age Group Analytics
+			</p>
+		</div>
+
+		<!-- Age Group Analytics Table -->
+		<div class="bg-white p-5 rounded-lg mx-5 my-5 shadow-sm">
+			<h2 class="text-xl font-bold text-gray-800 mb-4">
+				📊 Average Vitals by Age Group
+			</h2>
+			<div class="overflow-x-auto">
+				<table class="w-full table-auto">
+					<thead>
+						<tr class="bg-gray-50">
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Age Group
+							</th>
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Total Readings
+							</th>
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Avg Temperature
+							</th>
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Avg Pulse Rate
+							</th>
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Avg Systolic
+							</th>
+							<th class="px-4 py-2 text-left font-medium text-gray-700">
+								Avg Diastolic
+							</th>
+						</tr>
+					</thead>
+					<tbody id="ageGroupTable">
+						<tr>
+							<td colspan="6" class="px-4 py-8 text-center text-gray-500">
+								Loading data...
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- Refresh Button -->
+		<div class="bg-white p-5 rounded-lg mx-5 my-5 shadow-sm">
+			<button
+				class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+				onclick="refreshData()"
+				id="refreshButton"
+			>
+				🔄 Refresh Data
+			</button>
+			<span class="ml-4 text-gray-600" id="lastUpdated"
+				>Last updated: Never</span
+			>
+		</div>
+
+		<script>
+			async function refreshData() {
+				const button = document.getElementById("refreshButton");
+				const lastUpdated = document.getElementById("lastUpdated");
+
+				try {
+					// Disable button and show loading
+					button.disabled = true;
+					button.textContent = "🔄 Refreshing...";
+					lastUpdated.textContent = "Refreshing materialized view...";
+
+					// First, refresh the materialized view
+					const refreshResponse = await fetch(
+						"http://localhost:5001/api/refresh"
+					);
+					const refreshResult = await refreshResponse.json();
+
+					if (!refreshResult.success) {
+						throw new Error(refreshResult.message);
+					}
+
+					// Then load the updated data
+					await loadData();
+				} catch (error) {
+					console.error("Error refreshing data:", error);
+					document.getElementById(
+						"ageGroupTable"
+					).innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Failed to refresh data: ${error.message}</td></tr>`;
+				} finally {
+					// Re-enable button
+					button.disabled = false;
+					button.textContent = "🔄 Refresh Data";
+				}
+			}
+
+			async function loadData() {
+				try {
+					// Load age group data
+					const response = await fetch(
+						"http://localhost:5001/api/vitals-by-age-group"
+					);
+					const result = await response.json();
+
+					if (result.success) {
+						updateTable(result.data);
+					} else {
+						document.getElementById(
+							"ageGroupTable"
+						).innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">${result.message}</td></tr>`;
+					}
+
+					document.getElementById(
+						"lastUpdated"
+					).textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+				} catch (error) {
+					console.error("Error loading data:", error);
+					document.getElementById(
+						"ageGroupTable"
+					).innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Failed to load data</td></tr>`;
+				}
+			}
+
+			function updateTable(data) {
+				const tbody = document.getElementById("ageGroupTable");
+				tbody.innerHTML = data
+					.map(
+						(row) => `
+					<tr class="border-t hover:bg-gray-50">
+						<td class="px-4 py-3 font-medium text-blue-600">${row.ageGroup}</td>
+						<td class="px-4 py-3">${row.totalReadings.toLocaleString()}</td>
+						<td class="px-4 py-3">${row.avgTemperature}°F</td>
+						<td class="px-4 py-3">${row.avgPulseRate} BPM</td>
+						<td class="px-4 py-3">${row.avgSystolic} mmHg</td>
+						<td class="px-4 py-3">${row.avgDiastolic} mmHg</td>
+					</tr>
+				`
+					)
+					.join("");
+			}
+
+			// Load data when page loads
+			loadData();
+		</script>
+	</body>
+</html>
