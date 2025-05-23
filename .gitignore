@@ -50,10 +50,7 @@ logs/
 .DS_Store
 .ipynb_checkpoints
 
-# Database files
-*.sqlite
-*.db
-*.sql
+
 
 # Temporary files
 tmp/
