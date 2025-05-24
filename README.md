@@ -37,6 +37,8 @@ python etl/simple_etl.py
 python api/simple_api.py
 ```
 
+Alternatively you can use redash to visualize the data. [[./redash-setup/README.md](redash-setup/README.md)]
+
 The API will be available at `http://localhost:5001` with endpoints:
 
 - `/api/vitals-by-age-group` - Get aggregated vitals data
