@@ -1,7 +1,6 @@
-dlt[duckdb,mysql,postgres,sql_database]>=0.3.5
+dlt[postgres]>=0.3.5
 python-dotenv==1.0.1
 flask==3.0.2
 flask-cors==4.0.0
-pymysql>=1.0.0
 psycopg2-binary>=2.9.0
 cryptography>=3.4.0 
